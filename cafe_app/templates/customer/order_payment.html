@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Thanh toán đơn #{{ don.id }}{% endblock %}
+{% block content %}
+<div class="cafe-card bg-white p-4 mx-auto" style="max-width:560px">
+  <div class="text-center mb-3">
+    <i class="bi bi-check-circle-fill text-success" style="font-size:2.5rem"></i>
+    <h4 class="mt-2">Đơn hàng #{{ don.id }} — {{ don.so_ban or 'Mang đi' }}</h4>
+  </div>
+
+  <table class="table table-sm">
+    <tbody>
+      {% for item in chi_tiet %}
+      <tr><td>{{ item.ten_mon }} × {{ item.so_luong }}</td><td class="text-end">{{ '{:,}'.format(item.gia*item.so_luong) }} đ</td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr class="fw-bold border-top"><td>Tổng cộng</td><td class="text-end">{{ '{:,}'.format(don.tong_tien) }} đ</td></tr>
+    </tfoot>
+  </table>
+
+  {% if not don.phuong_thuc_tt %}
+    <p class="text-center text-muted mb-3">Vui lòng chọn hình thức thanh toán:</p>
+    <div class="row g-3">
+      <div class="col-6">
+        <form method="post">
+          <input type="hidden" name="phuong_thuc" value="Tiền mặt">
+          <button type="submit" class="btn btn-cafe w-100 py-4">
+            <i class="bi bi-cash-stack d-block mb-2" style="font-size:1.8rem"></i>
+            Tiền mặt
+          </button>
+        </form>
+      </div>
+      <div class="col-6">
+        <form method="post">
+          <input type="hidden" name="phuong_thuc" value="Chuyển khoản">
+          <button type="submit" class="btn btn-cafe w-100 py-4">
+            <i class="bi bi-qr-code d-block mb-2" style="font-size:1.8rem"></i>
+            Chuyển khoản
+          </button>
+        </form>
+      </div>
+    </div>
+
+  {% elif don.phuong_thuc_tt == 'Tiền mặt' %}
+    <div class="alert alert-success text-center">
+      <i class="bi bi-cash-stack" style="font-size:2rem"></i>
+      <p class="mb-0 mt-2">Bạn đã chọn thanh toán <strong>Tiền mặt</strong>.<br>Vui lòng thanh toán tại quầy. Nhân viên sẽ xác nhận sau khi nhận đủ tiền.</p>
+    </div>
+
+  {% elif don.phuong_thuc_tt == 'Chuyển khoản' %}
+    <div class="text-center">
+      <p class="mb-2"><strong>Quét mã QR bên dưới để chuyển khoản</strong></p>
+      <div id="qrcode" class="d-flex justify-content-center my-3"></div>
+      <table class="table table-sm text-start">
+        <tr><td>Ngân hàng</td><td class="text-end">{{ bank.ten_ngan_hang }}</td></tr>
+        <tr><td>Số tài khoản</td><td class="text-end">{{ bank.so_tk }}</td></tr>
+        <tr><td>Chủ tài khoản</td><td class="text-end">{{ bank.chu_tk }}</td></tr>
+        <tr><td>Số tiền</td><td class="text-end fw-bold">{{ '{:,}'.format(don.tong_tien) }} đ</td></tr>
+        <tr><td>Nội dung CK</td><td class="text-end">DH{{ don.id }}</td></tr>
+      </table>
+      <div class="alert alert-info small">Sau khi chuyển khoản thành công, nhân viên sẽ kiểm tra và xác nhận thanh toán cho đơn của bạn.</div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+      new QRCode(document.getElementById("qrcode"), {
+        text: {{ qr_content|tojson }},
+        width: 220,
+        height: 220
+      });
+    </script>
+  {% endif %}
+
+  {% if don.phuong_thuc_tt %}
+  <div class="text-center mt-3">
+    <form method="post" action="{{ url_for('order_payment_reset', don_id=don.id) }}">
+      <button class="btn btn-sm btn-link text-muted">Chọn lại hình thức thanh toán</button>
+    </form>
+    <a href="{{ url_for('menu') }}" class="btn btn-cafe mt-2"><i class="bi bi-arrow-left"></i> Về trang Menu</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

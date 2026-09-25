@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý đơn hàng{% endblock %}
+{% block content %}
+<h3 class="mb-3"><i class="bi bi-receipt"></i> Quản lý đơn hàng</h3>
+
+<ul class="nav nav-pills mb-4">
+  <li class="nav-item"><a class="nav-link {% if not filter_status %}active{% endif %}" href="{{ url_for('staff_orders') }}">Tất cả</a></li>
+  {% for st in trang_thai_list %}
+  <li class="nav-item"><a class="nav-link {% if filter_status==st %}active{% endif %}" href="{{ url_for('staff_orders', trang_thai=st) }}">{{ st }}</a></li>
+  {% endfor %}
+</ul>
+
+<div class="table-responsive cafe-card bg-white p-3">
+<table class="table align-middle">
+  <thead>
+    <tr><th>Mã đơn</th><th>Bàn</th><th>Khách</th><th>Thời gian</th><th>Tổng tiền</th><th>Trạng thái</th><th>Thanh toán</th><th class="text-end">Thao tác</th></tr>
+  </thead>
+  <tbody>
+    {% for don in don_list %}
+    <tr>
+      <td>#{{ don.id }}</td>
+      <td>{{ don.so_ban or 'Mang đi' }}</td>
+      <td>{{ don.ten_khach or '-' }}</td>
+      <td class="small text-muted">{{ don.thoi_gian }}</td>
+      <td>{{ '{:,}'.format(don.tong_tien) }} đ</td>
+      <td>
+        {% set badge = {'Chờ xác nhận':'warning','Đang chuẩn bị':'info','Đã hoàn thành':'success','Đã hủy':'secondary'} %}
+        <span class="badge text-bg-{{ badge.get(don.trang_thai,'secondary') }} badge-status">{{ don.trang_thai }}</span>
+      </td>
+      <td>
+        {% if don.da_thanh_toan %}<span class="badge text-bg-success">Đã thanh toán</span>{% else %}<span class="badge text-bg-danger">Chưa TT</span>{% endif %}
+      </td>
+      <td class="text-end">
+        <a href="{{ url_for('staff_order_detail', don_id=don.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i> Chi tiết</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8" class="text-center text-muted">Chưa có đơn hàng nào.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}
