@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Đặt món thành công{% endblock %}
+{% block content %}
+<div class="cafe-card bg-white p-5 text-center">
+  <i class="bi bi-check-circle-fill text-success" style="font-size:3rem"></i>
+  <h3 class="mt-3">Đặt món thành công!</h3>
+  <p class="text-muted">Mã đơn hàng của bạn là <strong>#{{ don.id }}</strong>. Quán đang xử lý đơn hàng của bạn.</p>
+  <table class="table table-sm mt-4 text-start">
+    <thead><tr><th>Món</th><th>SL</th><th>Đơn giá</th><th>Thành tiền</th></tr></thead>
+    <tbody>
+      {% for item in chi_tiet %}
+      <tr><td>{{ item.ten_mon }}</td><td>{{ item.so_luong }}</td><td>{{ '{:,}'.format(item.gia) }} đ</td><td>{{ '{:,}'.format(item.gia*item.so_luong) }} đ</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <h5 class="text-end">Tổng cộng: {{ '{:,}'.format(don.tong_tien) }} đ</h5>
+  <a href="{{ url_for('menu') }}" class="btn btn-cafe mt-3"><i class="bi bi-arrow-left"></i> Về trang Menu</a>
+</div>
+{% endblock %}

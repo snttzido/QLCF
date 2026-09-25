@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý món{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><i class="bi bi-cup-straw"></i> Quản lý món ăn / đồ uống</h3>
+  <a href="{{ url_for('staff_menu_add') }}" class="btn btn-cafe"><i class="bi bi-plus-lg"></i> Thêm món</a>
+</div>
+
+<div class="table-responsive cafe-card bg-white p-3">
+<table class="table align-middle">
+  <thead>
+    <tr><th>#</th><th>Tên món</th><th>Loại</th><th>Giá</th><th>Mô tả</th><th>Trạng thái</th><th class="text-end">Thao tác</th></tr>
+  </thead>
+  <tbody>
+    {% for mon in mon_list %}
+    <tr>
+      <td>{{ mon.id }}</td>
+      <td>{{ mon.ten }}</td>
+      <td><span class="badge text-bg-secondary">{{ mon.loai }}</span></td>
+      <td>{{ '{:,}'.format(mon.gia) }} đ</td>
+      <td class="text-muted small">{{ mon.mo_ta }}</td>
+      <td>
+        {% if mon.con_ban %}
+        <span class="badge text-bg-success badge-status">Còn bán</span>
+        {% else %}
+        <span class="badge text-bg-secondary badge-status">Ngừng bán</span>
+        {% endif %}
+      </td>
+      <td class="text-end">
+        <a href="{{ url_for('staff_menu_edit', mon_id=mon.id) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+        <form method="post" action="{{ url_for('staff_menu_toggle', mon_id=mon.id) }}" class="d-inline">
+          <button class="btn btn-sm btn-outline-warning" title="Bật/tắt bán"><i class="bi bi-toggle2-on"></i></button>
+        </form>
+        <form method="post" action="{{ url_for('staff_menu_delete', mon_id=mon.id) }}" class="d-inline" onsubmit="return confirm('Xóa món này?');">
+          <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+        </form>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" class="text-center text-muted">Chưa có món nào.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

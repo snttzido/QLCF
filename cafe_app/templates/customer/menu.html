@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Menu món - Quán Cà Phê{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><i class="bi bi-journal-richtext"></i> Danh sách đồ uống / đồ ăn</h3>
+</div>
+
+<ul class="nav nav-pills mb-4" id="loaiTab">
+  <li class="nav-item"><button class="nav-link active" data-filter="all">Tất cả</button></li>
+  {% for loai in loai_list %}
+  <li class="nav-item"><button class="nav-link" data-filter="{{ loai }}">{{ loai }}</button></li>
+  {% endfor %}
+</ul>
+
+<form method="post" action="{{ url_for('add_to_cart') }}">
+<div class="row g-4" id="monList">
+  {% for mon in mon_list %}
+  <div class="col-sm-6 col-lg-4 mon-item" data-loai="{{ mon.loai }}">
+    <div class="card cafe-card h-100">
+      <div class="card-body d-flex flex-column">
+        <div class="d-flex justify-content-between">
+          <h5 class="card-title">{{ mon.ten }}</h5>
+          <span class="badge text-bg-secondary align-self-start">{{ mon.loai }}</span>
+        </div>
+        <p class="card-text text-muted small flex-grow-1">{{ mon.mo_ta }}</p>
+        <p class="fw-bold text-brown mb-2">{{ '{:,}'.format(mon.gia) }} đ</p>
+        <div class="input-group input-group-sm">
+          <span class="input-group-text">SL</span>
+          <input type="number" class="form-control" name="so_luong_{{ mon.id }}" value="1" min="1" style="max-width:70px">
+          <button type="submit" name="mon_id" value="{{ mon.id }}" class="btn btn-cafe"><i class="bi bi-cart-plus"></i> Chọn món</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">Hiện chưa có món nào trong menu.</p>
+  {% endfor %}
+</div>
+</form>
+
+<script>
+document.querySelectorAll('#loaiTab button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#loaiTab button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.dataset.filter;
+    document.querySelectorAll('.mon-item').forEach(item => {
+      item.style.display = (filter === 'all' || item.dataset.loai === filter) ? '' : 'none';
+    });
+  });
+});
+</script>
+{% endblock %}

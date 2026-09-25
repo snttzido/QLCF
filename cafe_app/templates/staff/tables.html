@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Quản lý bàn{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0"><i class="bi bi-grid-3x3-gap"></i> Quản lý bàn</h3>
+  <form method="post" action="{{ url_for('staff_table_add') }}" class="d-flex gap-2">
+    <input type="text" name="so_ban" class="form-control form-control-sm" placeholder="Tên bàn, VD: Bàn 7" required>
+    <button class="btn btn-sm btn-cafe"><i class="bi bi-plus-lg"></i> Thêm bàn</button>
+  </form>
+</div>
+
+<div class="row g-3">
+  {% for ban in ban_list %}
+  <div class="col-6 col-md-3">
+    <div class="cafe-card p-3 text-center bg-white">
+      <i class="bi bi-square" style="font-size:1.8rem; color:{{ '#d9534f' if ban.trang_thai=='Có khách' else '#5cb85c' }}"></i>
+      <h5 class="mt-2 mb-1">{{ ban.so_ban }}</h5>
+      {% if ban.trang_thai == 'Có khách' %}
+      <span class="badge text-bg-danger badge-status">Có khách</span>
+      {% else %}
+      <span class="badge text-bg-success badge-status">Trống</span>
+      {% endif %}
+      <div class="qr-mini d-flex justify-content-center my-2" id="qr-{{ ban.id }}"></div>
+      <div class="d-flex justify-content-center gap-1 flex-wrap mt-1">
+        <form method="post" action="{{ url_for('staff_table_toggle', ban_id=ban.id) }}">
+          <button class="btn btn-sm btn-outline-primary"><i class="bi bi-arrow-repeat"></i></button>
+        </form>
+        <a href="{{ url_for('staff_table_qr', ban_id=ban.id) }}" target="_blank" class="btn btn-sm btn-outline-dark"><i class="bi bi-printer"></i> In QR</a>
+        <form method="post" action="{{ url_for('staff_table_delete', ban_id=ban.id) }}" onsubmit="return confirm('Xóa bàn này?');">
+          <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">Chưa có bàn nào.</p>
+  {% endfor %}
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+  {% for ban in ban_list %}
+  new QRCode(document.getElementById("qr-{{ ban.id }}"), {
+    text: {{ url_for('vao_ban', ban_id=ban.id, _external=True)|tojson }},
+    width: 96,
+    height: 96
+  });
+  {% endfor %}
+</script>
+{% endblock %}
